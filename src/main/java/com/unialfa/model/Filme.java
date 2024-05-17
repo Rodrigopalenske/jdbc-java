@@ -16,6 +16,14 @@ public class Filme {
         this.diretor = diretor;
     }
 
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
     public String getNome() {
         return nome;
     }
@@ -34,10 +42,7 @@ public class Filme {
 
     @Override
     public String toString() {
-        return "ID: " + id + " Nome: " + nome + " Diretor: " + diretor;
+        return "Id: " + id + " Nome: " + nome + " Diretor: " + diretor;
     }
 
-    public Integer getId() {
-        return id;
-    }
 }

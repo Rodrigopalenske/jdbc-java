@@ -24,11 +24,26 @@ public class FilmeDao {
     }
 
     public void inserir(Filme filme) throws SQLException {
-        String sql = "insert into filme(nome, diretor) values(?,?)";
+        String sql = "insert into filme(nome,diretor) values(?,?)";
         PreparedStatement ps = connection.prepareStatement(sql);
         ps.setString(1, filme.getNome());
         ps.setString(2, filme.getDiretor());
         ps.execute();
+    }
+
+    public List<Filme> listarTodos() throws SQLException {
+        List<Filme> filmes = new ArrayList<Filme>();
+
+        ResultSet rs = connection.prepareStatement("select * from filme").executeQuery();
+        while (rs.next()) {
+            filmes.add(new Filme(
+                    rs.getInt("id"),
+                    rs.getString("nome"),
+                    rs.getString("diretor")));
+        }
+        rs.close();
+
+        return filmes;
     }
 
     public void atualizar(Filme filme) throws SQLException {
@@ -50,7 +65,7 @@ public class FilmeDao {
     public Filme consultarPorId(int id) throws SQLException {
         Filme filme = new Filme("", "");
 
-        String sql = "select * from filme where id = ?";
+        String sql = "select * from Filme where idFilme = ?";
         PreparedStatement ps = connection.prepareStatement(sql);
         ps.setInt(1, id);
         ResultSet rs = ps.executeQuery();
@@ -63,31 +78,19 @@ public class FilmeDao {
     }
 
     public List<Filme> listarContenhaNome(String nome) throws SQLException {
-        List<Filme> filmes = new ArrayList<Filme>();
+        List<Filme> Filmes = new ArrayList<Filme>();
 
-        String sql = "select * from filme where nome like ?";
+        String sql = "select * from Filme where nome like ?";
         PreparedStatement ps = connection.prepareStatement(sql);
         ps.setString(1, "%" + nome + "%");
         ResultSet rs = ps.executeQuery();
 
         while (rs.next()) {
             Filme Filme = new Filme(rs.getString("nome"), rs.getString("diretor"));
-            filmes.add(Filme);
+            Filmes.add(Filme);
         }
         rs.close();
 
-        return filmes;
-    }
-
-    public List<Filme> listarTodos() throws SQLException {
-        List<Filme> filmes = new ArrayList<Filme>();
-
-        ResultSet rs = connection.prepareStatement("select * from filme").executeQuery();
-        while (rs.next()) {
-            filmes.add(new Filme(rs.getInt("id"), rs.getString("nome"), rs.getString("diretor")));
-        }
-        rs.close();
-
-        return filmes;
+        return Filmes;
     }
 }
