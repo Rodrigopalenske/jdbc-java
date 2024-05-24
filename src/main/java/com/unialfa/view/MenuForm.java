@@ -6,6 +6,7 @@ import java.awt.*;
 public class MenuForm extends JFrame{
     private JButton botaoFilme;
     private JButton botaoDiretor;
+
     
     public MenuForm(){
         setTitle("Menu Filmes");
@@ -35,11 +36,13 @@ public class MenuForm extends JFrame{
     }
 
     private void irFormDiretor() {
+        setVisible(false);
         var form = new DiretorForm();
         form.setVisible(true);
     }
 
     private void irFormFilme() {
+        setVisible(false);
         var form = new FilmeForm();
         form.setVisible(true);
     }

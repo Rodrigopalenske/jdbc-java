@@ -4,11 +4,16 @@ import com.unialfa.model.Diretor;
 import com.unialfa.service.DiretorService;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import java.awt.*;
 import java.sql.Date;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class DiretorForm extends JFrame{
     private DiretorService service;
@@ -28,7 +33,9 @@ public class DiretorForm extends JFrame{
     private JButton botaoSalvar;
     private JButton botaoCancelar;
     private JButton botaoExcluir;
-    private JTable tabelaFilme;
+    private JButton botaoVoltar;
+
+    private JTable tabelaDiretor;
 
 
     public DiretorForm(){
@@ -36,7 +43,7 @@ public class DiretorForm extends JFrame{
 
         setTitle("Diretor");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(500, 550);
+        setSize(700, 650);
 
         JPanel painelEntrada = new JPanel(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
@@ -103,44 +110,136 @@ public class DiretorForm extends JFrame{
         constraints.gridy = 5;
         painelEntrada.add(campoDataInicioCarreira, constraints);
 
+        botaoVoltar = new JButton("Voltar");
+        botaoVoltar.addActionListener(e -> executarVoltar());
+        constraints.gridx = 0;
+        constraints.gridy = 6;
+        painelEntrada.add(botaoVoltar, constraints);
+
+        botaoCancelar = new JButton("Cancelar");
+        botaoCancelar.addActionListener(e -> limparCampos());
+        constraints.gridx = 1;
+        constraints.gridy = 6;
+        painelEntrada.add(botaoCancelar, constraints);
+
         botaoSalvar = new JButton("Salvar");
         botaoSalvar.addActionListener(e ->
             executarSalvar()
         );
-        constraints.gridx = 1;
+        constraints.gridx = 2;
         constraints.gridy = 6;
         painelEntrada.add(botaoSalvar, constraints);
 
         botaoExcluir = new JButton("Excluir");
         botaoExcluir.addActionListener(e -> executarDeletar());
-        constraints.gridx = 2;
+        constraints.gridx = 3;
         constraints.gridy = 6;
         painelEntrada.add(botaoExcluir, constraints);
 
         JPanel painelSaida = new JPanel(new BorderLayout());
 
-        //tabelaFilme = new JTable();
-        //tabelaFilme.setModel(carregarDadosLocadoras());
-        //tabelaFilme.getSelectionModel().addListSelectionListener(e -> selecionarFilme(e));
-        //tabelaFilme.setDefaultEditor(Object.class, null);
-        //JScrollPane scrollPane = new JScrollPane(tabelaFilme);
-        //painelSaida.add(scrollPane, BorderLayout.CENTER);
+        tabelaDiretor = new JTable();
+        tabelaDiretor.setModel(carregarDadosLocadoras());
+        tabelaDiretor.getSelectionModel().addListSelectionListener(e -> selecionarDiretor(e));
+        tabelaDiretor.setDefaultEditor(Object.class, null);
+        JScrollPane scrollPane = new JScrollPane(tabelaDiretor);
+        painelSaida.add(scrollPane, BorderLayout.CENTER);
 
         getContentPane().add(painelEntrada, BorderLayout.NORTH);
-        //getContentPane().add(painelSaida, BorderLayout.CENTER);
+        getContentPane().add(painelSaida, BorderLayout.CENTER);
 
         setLocationRelativeTo(null);
 
 
     }
 
+    private void executarVoltar() {
+        setVisible(false);
+        var form = new MenuForm();
+        form.setVisible(true);
+    }
+
     private Diretor construirDiretor(){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        var dataNascimento = campoDataNascimento.getText();
+        var data = LocalDate.parse(dataNascimento, formatter);
+        System.out.println(data);
+
         return campoId.getText().isEmpty()
-                ? new Diretor(campoNomeDiretor.getText(), campoNacionalidade.getText(), Date.valueOf(campoDataNascimento.getText()) , Integer.parseInt(campoPremiacao.getText()), Date.valueOf(campoDataInicioCarreira.getText()))
-                : new Diretor(Integer.parseInt(campoId.getText()), campoNomeDiretor.getText(), campoNacionalidade.getText(), Date.valueOf(campoDataNascimento.getText()), Integer.parseInt(campoPremiacao.getText()), Date.valueOf(campoDataInicioCarreira.getText()));
+                ? new Diretor(campoNomeDiretor.getText(), campoNacionalidade.getText(), Date.valueOf(LocalDate.parse(campoDataNascimento.getText(), formatter)), Integer.parseInt(campoPremiacao.getText()), Date.valueOf(LocalDate.parse(campoDataInicioCarreira.getText(), formatter)))
+                : new Diretor(Integer.parseInt(campoId.getText()), campoNomeDiretor.getText(), campoNacionalidade.getText(), Date.valueOf(LocalDate.parse(campoDataNascimento.getText(), formatter)), Integer.parseInt(campoPremiacao.getText()), Date.valueOf(LocalDate.parse(campoDataInicioCarreira.getText(), formatter)));
+
+    }
+
+    private TableModel carregarDadosLocadoras() {
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("ID");
+        model.addColumn("Nome");
+        model.addColumn("Nacionalidade");
+        model.addColumn("Data Nascimento");
+        model.addColumn("Quant. Prêmiações");
+        model.addColumn("Data Inicio de Carreira");
+
+        service.listarDiretores().forEach(diretor ->
+                model.addRow(new Object[]{
+                        diretor.getId(),
+                        diretor.getNome(),
+                        diretor.getNacionalidade(),
+                        formatarData(diretor.getDataNascimento().toString()),
+                        diretor.getPremiacao().toString(),
+                        formatarData(diretor.getDataInicioCarreira().toString())
+                })
+        );
+
+        return model;
+    }
+
+    private String formatarData(String dataOriginal){
+        try {
+            DateTimeFormatter formatarEntrada = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            DateTimeFormatter formatarSaida = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            LocalDate date = LocalDate.parse(dataOriginal, formatarEntrada);
+
+            // Formata a data no novo formato
+            String outputDateString = date.format(formatarSaida);
+
+            return outputDateString;
+        } catch (Exception e) {
+            return dataOriginal;
+        }
+    }
+
+    private void selecionarDiretor(ListSelectionEvent e) {
+        if (!e.getValueIsAdjusting()) {
+            int selectedRow = tabelaDiretor.getSelectedRow();
+            if (selectedRow != -1) {
+                var id = (Integer) tabelaDiretor.getValueAt(selectedRow, 0);
+                campoId.setText(id.toString());
+
+                var nome = (String) tabelaDiretor.getValueAt(selectedRow, 1);
+                campoNomeDiretor.setText(nome);
+
+                var nacionalidade = (String) tabelaDiretor.getValueAt(selectedRow, 2);
+                campoNacionalidade.setText(nacionalidade);
+
+                var dataNascimento = (String) tabelaDiretor.getValueAt(selectedRow, 3);
+                campoDataNascimento.setText(formatarData(dataNascimento));
+                //campoDataNascimento.setText(dataNascimento);
+
+                var premiacao = (String) tabelaDiretor.getValueAt(selectedRow, 4);
+                campoPremiacao.setText(premiacao);
+
+                var dataInicioCarreira = (String) tabelaDiretor.getValueAt(selectedRow, 5);
+                campoDataInicioCarreira.setText(formatarData(dataInicioCarreira));
+                //campoDataInicioCarreira.setText(dataInicioCarreira);
+            }
+        }
     }
 
     private void executarDeletar() {
+        service.deletar(construirDiretor());
+        limparCampos();
+        tabelaDiretor.setModel(carregarDadosLocadoras());
     }
 
     private void limparCampos() {
@@ -153,8 +252,8 @@ public class DiretorForm extends JFrame{
     }
 
     private void executarSalvar() {
-            service.salvar(construirDiretor());
-            limparCampos();
-
+        service.salvar(construirDiretor());
+        limparCampos();
+        tabelaDiretor.setModel(carregarDadosLocadoras());
     }
 }

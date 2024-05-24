@@ -8,25 +8,25 @@ public class Diretor {
     private Integer id;
     private String nome;
     private String nacionalidade;
-    private Date DateNascimento;
+    private Date DataNascimento;
     private Integer premiacao;
-    private Date DateInicioCarreira;
+    private Date DataInicioCarreira;
 
-    public Diretor(Integer id, String nome, String nacionalidade, Date DateNascimento, Integer premiacao, Date DateInicioCarreira) {
+    public Diretor(Integer id, String nome, String nacionalidade, Date DataNascimento, Integer premiacao, Date DataInicioCarreira) {
         this.id = id;
         this.nome = nome;
         this.nacionalidade = nacionalidade;
-        this.DateNascimento = DateNascimento;
+        this.DataNascimento = DataNascimento;
         this.premiacao = premiacao;
-        this.DateInicioCarreira = DateInicioCarreira;
+        this.DataInicioCarreira = DataInicioCarreira;
     }
 
-    public Diretor(String nome, String nacionalidade, Date DateNascimento, Integer premiacao, Date DateInicioCarreira) {
+    public Diretor(String nome, String nacionalidade, Date DataNascimento, Integer premiacao, Date DataInicioCarreira) {
         this.nome = nome;
         this.nacionalidade = nacionalidade;
-        this.DateNascimento = DateNascimento;
+        this.DataNascimento = DataNascimento;
         this.premiacao = premiacao;
-        this.DateInicioCarreira = DateInicioCarreira;
+        this.DataInicioCarreira = DataInicioCarreira;
     }
 
     public Integer getId() {
@@ -53,13 +53,13 @@ public class Diretor {
         this.nacionalidade = nacionalidade;
     }
 
-    public Date getDateNascimento() {
-        return DateNascimento;
+    public Date getDataNascimento() {
+        return DataNascimento;
     }
 
-    public void setDateNascimento(Date DateNascimento){
+    public void setDataNascimento(Date DataNascimento){
 
-        this.DateNascimento = DateNascimento;
+        this.DataNascimento = DataNascimento;
 
     }
 
@@ -71,19 +71,19 @@ public class Diretor {
         this.premiacao = premiacao;
     }
 
-    public Date getDateInicioCarreira() {
-        return DateInicioCarreira;
+    public Date getDataInicioCarreira() {
+        return DataInicioCarreira;
     }
 
-    public void setDateInicioCarreira(Date DateInicioCarreira) {
-        this.DateInicioCarreira = DateInicioCarreira;
+    public void setDataInicioCarreira(Date DataInicioCarreira) {
+        this.DataInicioCarreira = DataInicioCarreira;
 
     }
 
     @Override
     public String toString() {
         return "Id: " + id + " Nome: " + nome + " Nacionalidade: " + nacionalidade + " Date Nascimento: "
-                + DateNascimento + " Quantidade de Prêmios: " + premiacao + " Date de Inicio de Carreira: " + DateInicioCarreira;
+                + DataNascimento + " Quantidade de Prêmios: " + premiacao + " Date de Inicio de Carreira: " + DataInicioCarreira;
 
     }
 }

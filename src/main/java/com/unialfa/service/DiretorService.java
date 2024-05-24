@@ -32,4 +32,14 @@ public class DiretorService {
             System.out.println(e.getMessage());
         }
     }
+
+    public List<Diretor> listarDiretores() {
+        try {
+            var dao = new DiretorDao();
+            return dao.listarTodos();
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return Collections.emptyList();
+        }
+    }
 }

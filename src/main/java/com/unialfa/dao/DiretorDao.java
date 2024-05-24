@@ -6,6 +6,9 @@ import com.unialfa.model.Filme;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DiretorDao {
     private Connection connection;
@@ -24,16 +27,36 @@ public class DiretorDao {
         return connection;
     }
 
+    public List<Diretor> listarTodos() throws SQLException {
+        List<Diretor> diretores = new ArrayList<Diretor>();
+
+        ResultSet rs = connection.prepareStatement("select * from diretor").executeQuery();
+        while (rs.next()) {
+            diretores.add(new Diretor(
+                    rs.getInt("id"),
+                    rs.getString("nome"),
+                    rs.getString("nacionalidade"),
+                    rs.getDate("data_nascimento"),
+                    rs.getInt("premiacao"),
+                    rs.getDate("data_inicio_carreira")));
+        }
+        rs.close();
+
+        return diretores;
+    }
+
     public void inserir(Diretor diretor) throws SQLException {
-        SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+
 
         String sql = "insert into diretor(nome,nacionalidade,data_nascimento,premiacao,data_inicio_carreira) values(?,?,?,?,?)";
         PreparedStatement ps = connection.prepareStatement(sql);
         ps.setString(1, diretor.getNome());
         ps.setString(2, diretor.getNacionalidade());
-        ps.setDate(3, diretor.getDateNascimento());
+        //ps.setDate(3, diretor.getDataNascimento());
+        ps.setDate(3, diretor.getDataNascimento());
         ps.setInt(4, diretor.getPremiacao());
-        ps.setDate(5, diretor.getDateInicioCarreira());
+        //ps.setDate(5, diretor.getDataInicioCarreira());
+        ps.setDate(5, diretor.getDataInicioCarreira());
         ps.execute();
     }
 
@@ -42,9 +65,9 @@ public class DiretorDao {
         PreparedStatement ps = connection.prepareStatement(sql);
         ps.setString(1, diretor.getNome());
         ps.setString(2, diretor.getNacionalidade());
-        ps.setDate(3, diretor.getDateNascimento());
+        ps.setDate(3, diretor.getDataNascimento());
         ps.setInt(4, diretor.getPremiacao());
-        ps.setDate(5, diretor.getDateInicioCarreira());
+        ps.setDate(5, diretor.getDataInicioCarreira());
         ps.setInt(6, diretor.getId());
 
         ps.execute();

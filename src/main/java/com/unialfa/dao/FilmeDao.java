@@ -65,7 +65,7 @@ public class FilmeDao {
     public Filme consultarPorId(int id) throws SQLException {
         Filme filme = new Filme("", "");
 
-        String sql = "select * from Filme where idFilme = ?";
+        String sql = "select * from filme where id = ?";
         PreparedStatement ps = connection.prepareStatement(sql);
         ps.setInt(1, id);
         ResultSet rs = ps.executeQuery();
@@ -80,7 +80,7 @@ public class FilmeDao {
     public List<Filme> listarContenhaNome(String nome) throws SQLException {
         List<Filme> Filmes = new ArrayList<Filme>();
 
-        String sql = "select * from Filme where nome like ?";
+        String sql = "select * from filme where nome like ?";
         PreparedStatement ps = connection.prepareStatement(sql);
         ps.setString(1, "%" + nome + "%");
         ResultSet rs = ps.executeQuery();

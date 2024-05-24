@@ -21,6 +21,7 @@ public class FilmeForm extends JFrame {
     private JButton botaoSalvar;
     private JButton botaoCancelar;
     private JButton botaoExcluir;
+    private JButton botaoVoltar;
     private JTable tabelaFilme;
 
     public FilmeForm() {
@@ -28,7 +29,7 @@ public class FilmeForm extends JFrame {
 
         setTitle("Filme");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(500, 550);
+        setSize(600, 550);
 
         JPanel painelEntrada = new JPanel(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
@@ -65,21 +66,27 @@ public class FilmeForm extends JFrame {
         constraints.gridy = 2;
         painelEntrada.add(campoDiretor, constraints);
 
+        botaoVoltar = new JButton("Voltar");
+        botaoVoltar.addActionListener(e -> executarVoltar());
+        constraints.gridx = 0;
+        constraints.gridy = 3;
+        painelEntrada.add(botaoVoltar, constraints);
+
         botaoCancelar = new JButton("Cancelar");
         botaoCancelar.addActionListener(e -> limparCampos());
-        constraints.gridx = 0;
+        constraints.gridx = 1;
         constraints.gridy = 3;
         painelEntrada.add(botaoCancelar, constraints);
 
         botaoSalvar = new JButton("Salvar");
         botaoSalvar.addActionListener(e -> executarAcaoDoBotao());
-        constraints.gridx = 1;
+        constraints.gridx = 2;
         constraints.gridy = 3;
         painelEntrada.add(botaoSalvar, constraints);
 
         botaoExcluir = new JButton("Excluir");
         botaoExcluir.addActionListener(e -> executarDeletar());
-        constraints.gridx = 2;
+        constraints.gridx = 3;
         constraints.gridy = 3;
         painelEntrada.add(botaoExcluir, constraints);
 
@@ -96,6 +103,12 @@ public class FilmeForm extends JFrame {
         getContentPane().add(painelSaida, BorderLayout.CENTER);
 
         setLocationRelativeTo(null);
+    }
+
+    private void executarVoltar() {
+        setVisible(false);
+        var form = new MenuForm();
+        form.setVisible(true);
     }
 
     private void executarDeletar() {
