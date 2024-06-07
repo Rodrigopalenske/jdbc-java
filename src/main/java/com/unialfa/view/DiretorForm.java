@@ -108,15 +108,9 @@ public class DiretorForm extends JFrame{
         constraints.gridy = 5;
         painelEntrada.add(campoDataInicioCarreira, constraints);
 
-        botaoVoltar = new JButton("Voltar");
-        botaoVoltar.addActionListener(e -> executarVoltar());
-        constraints.gridx = 0;
-        constraints.gridy = 6;
-        painelEntrada.add(botaoVoltar, constraints);
-
         botaoCancelar = new JButton("Cancelar");
         botaoCancelar.addActionListener(e -> limparCampos());
-        constraints.gridx = 1;
+        constraints.gridx = 0;
         constraints.gridy = 6;
         painelEntrada.add(botaoCancelar, constraints);
 
@@ -124,13 +118,13 @@ public class DiretorForm extends JFrame{
         botaoSalvar.addActionListener(e ->
             executarSalvar()
         );
-        constraints.gridx = 2;
+        constraints.gridx = 1;
         constraints.gridy = 6;
         painelEntrada.add(botaoSalvar, constraints);
 
         botaoExcluir = new JButton("Excluir");
         botaoExcluir.addActionListener(e -> executarDeletar());
-        constraints.gridx = 3;
+        constraints.gridx = 2;
         constraints.gridy = 6;
         painelEntrada.add(botaoExcluir, constraints);
 

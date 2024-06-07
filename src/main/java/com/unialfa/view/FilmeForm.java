@@ -1,5 +1,7 @@
 package com.unialfa.view;
 
+import com.unialfa.dao.DiretorDao;
+import com.unialfa.model.Diretor;
 import com.unialfa.model.Filme;
 import com.unialfa.service.FilmeService;
 
@@ -7,6 +9,8 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.*;
+import java.util.List;
 
 import static java.lang.Integer.parseInt;
 
@@ -17,12 +21,11 @@ public class FilmeForm extends JFrame {
     private JLabel labelNomeFilme;
     private JTextField campoNomeFilme;
     private JLabel labelDiretor;
-    private JTextField campoDiretor;
     private JButton botaoSalvar;
     private JButton botaoCancelar;
     private JButton botaoExcluir;
-    private JButton botaoVoltar;
     private JTable tabelaFilme;
+    private JComboBox campoDiretor;
 
     public FilmeForm() {
         service = new FilmeService();
@@ -61,32 +64,31 @@ public class FilmeForm extends JFrame {
         constraints.gridy = 2;
         painelEntrada.add(labelDiretor, constraints);
 
-        campoDiretor = new JTextField(20);
+        campoDiretor = new JComboBox<>();
+        campoDiretor.setEditable(false);
+        campoDiretor.setSize(20, 12);
+        listarDiretor().forEach(nomeDiretor ->
+                campoDiretor.addItem(nomeDiretor)
+        );
         constraints.gridx = 1;
         constraints.gridy = 2;
         painelEntrada.add(campoDiretor, constraints);
 
-        botaoVoltar = new JButton("Voltar");
-        botaoVoltar.addActionListener(e -> executarVoltar());
-        constraints.gridx = 0;
-        constraints.gridy = 3;
-        painelEntrada.add(botaoVoltar, constraints);
-
         botaoCancelar = new JButton("Cancelar");
         botaoCancelar.addActionListener(e -> limparCampos());
-        constraints.gridx = 1;
+        constraints.gridx = 0;
         constraints.gridy = 3;
         painelEntrada.add(botaoCancelar, constraints);
 
         botaoSalvar = new JButton("Salvar");
         botaoSalvar.addActionListener(e -> executarAcaoDoBotao());
-        constraints.gridx = 2;
+        constraints.gridx = 1;
         constraints.gridy = 3;
         painelEntrada.add(botaoSalvar, constraints);
 
         botaoExcluir = new JButton("Excluir");
         botaoExcluir.addActionListener(e -> executarDeletar());
-        constraints.gridx = 3;
+        constraints.gridx = 2;
         constraints.gridy = 3;
         painelEntrada.add(botaoExcluir, constraints);
 
@@ -105,11 +107,19 @@ public class FilmeForm extends JFrame {
         setLocationRelativeTo(null);
     }
 
-    private Integer executarVoltar() {
-        //setVisible(false);
-        var form = new MenuForm();
-        form.setVisible(true);
-        return 1;
+    private java.util.List<Object> listarDiretor() {
+        try {
+            var dao = new DiretorDao();
+            var diretores =  dao.listarTodos();
+            var nomeDiretores = new ArrayList<>();
+            diretores.forEach(diretor ->
+                    nomeDiretores.add(diretor.getNome())
+            );
+            return nomeDiretores;
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return Collections.emptyList();
+        }
     }
 
     private void executarDeletar() {
@@ -121,7 +131,7 @@ public class FilmeForm extends JFrame {
 
     private void limparCampos() {
         campoNomeFilme.setText("");
-        campoDiretor.setText("");
+        campoDiretor.setSelectedIndex(0);
         campoId.setText("");
     }
 
@@ -157,13 +167,15 @@ public class FilmeForm extends JFrame {
     private Filme construirFilme() {
         if (campoNomeFilme.getText().isEmpty()) throw new RuntimeException("Campo nome do filme não pode ser vazio");
         if (campoNomeFilme.getText().isBlank()) throw new RuntimeException("Campo nome do filme não pode ser espaço");
-        if (campoDiretor.getText().isEmpty()) throw new RuntimeException("Campo diretor do filme não pode ser vazio");
-        if (campoDiretor.getText().isBlank()) throw new RuntimeException("Campo diretor do filme não pode ser espaço");
+
+        if (campoDiretor.getSelectedItem().toString().isEmpty()) throw new RuntimeException("Campo diretor do filme não pode ser vazio");
+        if (campoDiretor.getSelectedItem().toString().isBlank()) throw new RuntimeException("Campo diretor do filme não pode ser espaço");
+
         return campoId.getText().isEmpty()
-                ? new Filme(campoNomeFilme.getText(), campoDiretor.getText())
+                ? new Filme(campoNomeFilme.getText(), campoDiretor.getSelectedItem().toString())
                 : new Filme(parseInt(campoId.getText()),
                 campoNomeFilme.getText(),
-                campoDiretor.getText());
+                campoDiretor.getSelectedItem().toString());
     }
 
 
@@ -178,7 +190,9 @@ public class FilmeForm extends JFrame {
                 campoNomeFilme.setText(nome);
 
                 var diretor = (String) tabelaFilme.getValueAt(selectedRow, 2);
-                campoDiretor.setText(diretor);
+                int indexDiretor = ((DefaultComboBoxModel)campoDiretor.getModel()).getIndexOf(diretor);
+
+                campoDiretor.setSelectedIndex(indexDiretor);
             }
         }
     }
