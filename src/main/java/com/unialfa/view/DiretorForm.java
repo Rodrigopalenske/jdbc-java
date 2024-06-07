@@ -9,9 +9,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import java.awt.*;
 import java.sql.Date;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -42,7 +40,7 @@ public class DiretorForm extends JFrame{
         service = new DiretorService();
 
         setTitle("Diretor");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         setSize(700, 650);
 
         JPanel painelEntrada = new JPanel(new GridBagLayout());
@@ -142,6 +140,7 @@ public class DiretorForm extends JFrame{
         tabelaDiretor.setModel(carregarDadosLocadoras());
         tabelaDiretor.getSelectionModel().addListSelectionListener(e -> selecionarDiretor(e));
         tabelaDiretor.setDefaultEditor(Object.class, null);
+
         JScrollPane scrollPane = new JScrollPane(tabelaDiretor);
         painelSaida.add(scrollPane, BorderLayout.CENTER);
 
@@ -149,8 +148,6 @@ public class DiretorForm extends JFrame{
         getContentPane().add(painelSaida, BorderLayout.CENTER);
 
         setLocationRelativeTo(null);
-
-
     }
 
     private void executarVoltar() {
@@ -160,15 +157,34 @@ public class DiretorForm extends JFrame{
     }
 
     private Diretor construirDiretor(){
+        if (campoNomeDiretor.getText().isEmpty()) throw new RuntimeException("Campo nome do diretor não pode ser vazio");
+        if (campoNomeDiretor.getText().isBlank()) throw new RuntimeException("Campo nome do diretor não pode ser espaço");
+
+        if (campoNacionalidade.getText().isEmpty()) throw new RuntimeException("Campo nacionalidade não pode ser vazio");
+        if (campoNacionalidade.getText().isBlank()) throw new RuntimeException("Campo nacionalidade não pode ser espaço");
+
+        if (campoDataNascimento.getText().isEmpty()) throw new RuntimeException("Campo data de nascimento não pode ser vazio");
+        if (campoDataNascimento.getText().isBlank()) throw new RuntimeException("Campo data de nascimento não pode ser espaço");
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         var dataNascimento = campoDataNascimento.getText();
         var data = LocalDate.parse(dataNascimento, formatter);
+
+        if (campoPremiacao.getText().isEmpty()) throw new RuntimeException("Campo quantidade de premiações não pode ser vazio");
+        if (campoPremiacao.getText().isBlank()) throw new RuntimeException("Campo quantidade de premiações não pode ser espaço");
+        var validaQuantPremiacao = Integer.parseInt(campoPremiacao.getText());
+        if (validaQuantPremiacao < 0) throw new RuntimeException("Campo quantidade de premiações não pode ser menor que zero");
+
+        if (campoDataInicioCarreira.getText().isEmpty()) throw new RuntimeException("Campo data de início de carreira não pode ser vazio");
+        if (campoDataInicioCarreira.getText().isBlank()) throw new RuntimeException("Campo data de início de carreira não pode ser espaço");
+
+        var dataInicioCarreira = campoDataNascimento.getText();
+        data = LocalDate.parse(dataInicioCarreira, formatter);
         System.out.println(data);
 
         return campoId.getText().isEmpty()
                 ? new Diretor(campoNomeDiretor.getText(), campoNacionalidade.getText(), Date.valueOf(LocalDate.parse(campoDataNascimento.getText(), formatter)), Integer.parseInt(campoPremiacao.getText()), Date.valueOf(LocalDate.parse(campoDataInicioCarreira.getText(), formatter)))
                 : new Diretor(Integer.parseInt(campoId.getText()), campoNomeDiretor.getText(), campoNacionalidade.getText(), Date.valueOf(LocalDate.parse(campoDataNascimento.getText(), formatter)), Integer.parseInt(campoPremiacao.getText()), Date.valueOf(LocalDate.parse(campoDataInicioCarreira.getText(), formatter)));
-
     }
 
     private TableModel carregarDadosLocadoras() {
@@ -222,6 +238,7 @@ public class DiretorForm extends JFrame{
                 var nacionalidade = (String) tabelaDiretor.getValueAt(selectedRow, 2);
                 campoNacionalidade.setText(nacionalidade);
 
+                System.out.println();
                 var dataNascimento = (String) tabelaDiretor.getValueAt(selectedRow, 3);
                 campoDataNascimento.setText(formatarData(dataNascimento));
                 //campoDataNascimento.setText(dataNascimento);
@@ -252,8 +269,17 @@ public class DiretorForm extends JFrame{
     }
 
     private void executarSalvar() {
-        service.salvar(construirDiretor());
-        limparCampos();
-        tabelaDiretor.setModel(carregarDadosLocadoras());
+        try{
+            service.salvar(construirDiretor());
+            limparCampos();
+
+            tabelaDiretor.setModel(carregarDadosLocadoras());
+        } catch (NumberFormatException en) {
+            JOptionPane.showMessageDialog(this,"A quantidade de premiações deve ser um número");
+        } catch (DateTimeException ed){
+            JOptionPane.showMessageDialog(this, "As datas devem estar no formato (dia/mes/ano)");
+        }catch (Exception e){
+            JOptionPane.showMessageDialog(this, e.getMessage());
+        }
     }
 }

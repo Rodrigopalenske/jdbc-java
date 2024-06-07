@@ -28,7 +28,7 @@ public class FilmeForm extends JFrame {
         service = new FilmeService();
 
         setTitle("Filme");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         setSize(600, 550);
 
         JPanel painelEntrada = new JPanel(new GridBagLayout());
@@ -105,16 +105,18 @@ public class FilmeForm extends JFrame {
         setLocationRelativeTo(null);
     }
 
-    private void executarVoltar() {
-        setVisible(false);
+    private Integer executarVoltar() {
+        //setVisible(false);
         var form = new MenuForm();
         form.setVisible(true);
+        return 1;
     }
 
     private void executarDeletar() {
         service.deletar(construirFilme());
         limparCampos();
         tabelaFilme.setModel(carregarDadosLocadoras());
+
     }
 
     private void limparCampos() {
@@ -142,19 +144,28 @@ public class FilmeForm extends JFrame {
     }
 
     private void executarAcaoDoBotao() {
-        service.salvar(construirFilme());
-        limparCampos();
-        tabelaFilme.setModel(carregarDadosLocadoras());
+        try {
+            service.salvar(construirFilme());
+            limparCampos();
+            tabelaFilme.setModel(carregarDadosLocadoras());
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage());
+        }
+
     }
 
-    private Filme construirFilme(){
+    private Filme construirFilme() {
+        if (campoNomeFilme.getText().isEmpty()) throw new RuntimeException("Campo nome do filme não pode ser vazio");
+        if (campoNomeFilme.getText().isBlank()) throw new RuntimeException("Campo nome do filme não pode ser espaço");
+        if (campoDiretor.getText().isEmpty()) throw new RuntimeException("Campo diretor do filme não pode ser vazio");
+        if (campoDiretor.getText().isBlank()) throw new RuntimeException("Campo diretor do filme não pode ser espaço");
         return campoId.getText().isEmpty()
                 ? new Filme(campoNomeFilme.getText(), campoDiretor.getText())
-                : new Filme(
-                parseInt(campoId.getText()),
+                : new Filme(parseInt(campoId.getText()),
                 campoNomeFilme.getText(),
                 campoDiretor.getText());
     }
+
 
     private void selecionarFilme(ListSelectionEvent e){
         if (!e.getValueIsAdjusting()) {
